@@ -85,7 +85,7 @@ class RegistrationCubit extends Cubit<RegistrationState> {
 
       // Additional registration logic based on user type
       if (state.userType == UserType.student) {
-        _userRepository.saveUser(Student(
+        await _userRepository.saveUser(Student(
           userId: userCredential.user!.uid,
           name: state.name,
           surname: state.surname,
@@ -95,7 +95,7 @@ class RegistrationCubit extends Cubit<RegistrationState> {
           language: 'ru',
         ));
       } else if (state.userType == UserType.teacher) {
-        _userRepository.saveUser(Teacher(
+        await _userRepository.saveUser(Teacher(
           userId: userCredential.user!.uid,
           name: state.name,
           surname: state.surname,
