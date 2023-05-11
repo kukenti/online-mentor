@@ -52,8 +52,8 @@ class RegistrationForm extends StatelessWidget {
           // Show error snackbar
           PrimarySnackbar.showSnackbar(context: context, message: state.error);
         } else {
-          // Registration success
-          // Navigate to the next screen or show a success message
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => LoginScreen()));
         }
       },
       builder: (context, state) {
