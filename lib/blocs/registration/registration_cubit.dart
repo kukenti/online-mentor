@@ -106,7 +106,9 @@ class RegistrationCubit extends Cubit<RegistrationState> {
         ));
       }
 
-      // emit(state.copyWith(isLoading: false));
+      emit(state.copyWith(
+        registrationStatus: FormzStatus.submissionSuccess,
+      ));
     } catch (e) {
       String errorMessage = _parseFirebaseError(e);
       emit(state.copyWith(
