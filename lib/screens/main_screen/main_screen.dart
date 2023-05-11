@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:online_mentor/blocs/auth/auth_cubit.dart';
 import 'package:online_mentor/screens/home_screen/home_screen.dart';
+import 'package:online_mentor/screens/login_screen/login_screen.dart';
+import 'package:online_mentor/screens/profile/profile_screen.dart';
+import 'package:online_mentor/service_locator.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -11,7 +15,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    HomeScreen(),
+    ProfileScreen(),
   ];
 
   @override
@@ -19,6 +23,21 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Online mentor'),
+        actions: [
+          GestureDetector(
+            onTap: () {
+              getIt<AuthCubit>().signOut();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+                (route) => false,
+              );
+            },
+            child: Icon(
+              Icons.exit_to_app,
+              color: Colors.red,
+            ),
+          )
+        ],
       ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(

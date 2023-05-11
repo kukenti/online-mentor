@@ -115,6 +115,9 @@ class RegistrationCubit extends Cubit<RegistrationState> {
       ));
       debugPrint(e.toString());
     }
+    emit(state.copyWith(
+      registrationStatus: FormzStatus.pure,
+    ));
   }
 
   String _parseFirebaseError(dynamic error) {

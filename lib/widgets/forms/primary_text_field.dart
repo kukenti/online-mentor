@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class PrimaryTextField extends StatelessWidget {
   final TextEditingController? controller;
@@ -8,6 +9,7 @@ class PrimaryTextField extends StatelessWidget {
   final String? errorText;
   final bool obscureText;
   final Function(String)? onChanged;
+  final List<TextInputFormatter>? textFormatters;
 
   const PrimaryTextField({
     Key? key,
@@ -18,6 +20,7 @@ class PrimaryTextField extends StatelessWidget {
     this.errorText,
     this.isInvalid = false,
     this.obscureText = false,
+    this.textFormatters,
   }) : super(key: key);
 
   @override
@@ -36,6 +39,7 @@ class PrimaryTextField extends StatelessWidget {
           ),
           child: TextFormField(
             controller: controller,
+            inputFormatters: textFormatters,
             decoration: InputDecoration(
               labelText: labelText,
               border: InputBorder.none,
