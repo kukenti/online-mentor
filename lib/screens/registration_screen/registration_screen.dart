@@ -60,6 +60,10 @@ class RegistrationForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RegistrationCubit, RegistrationState>(
+      listenWhen: (p, c) => p.registrationStatus != c.registrationStatus,
+      buildWhen: (p, c) =>
+          p.userType != c.userType ||
+          p.registrationStatus != c.registrationStatus,
       listener: (context, state) {
         if (state.registrationStatus.isSubmissionInProgress) {
           // Show loading indicator
