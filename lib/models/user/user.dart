@@ -4,63 +4,49 @@ import 'package:online_mentor/models/speciality/speciality.dart';
 
 part 'user.g.dart';
 
-abstract class User {
+@JsonSerializable(explicitToJson: true)
+class User {
   String userId;
   String name;
   String surname;
   int age;
   String address;
   String email;
+  String? avatar;
   UserType userType;
-
-  User(
-    this.userId,
-    this.name,
-    this.surname,
-    this.age,
-    this.address,
-    this.email, {
-    required this.userType,
-  });
-
-  Map<String, dynamic> toJson();
-}
-
-@JsonSerializable(explicitToJson: true)
-class Student extends User {
+  EducationType? educationType;
+  Speciality? specialty;
+  String? phoneNumber;
   String? language;
 
-  Student({
-    required String userId,
-    required String name,
-    required String surname,
-    required int age,
-    required String address,
-    required String email,
+  User({
+    String? name,
+    String? surname,
+    int? age,
+    String? address,
+    String? email,
+    String? userId,
+    this.avatar,
+    this.educationType,
+    this.specialty,
+    this.phoneNumber,
     this.language,
-  }) : super(
-          userId,
-          name,
-          surname,
-          age,
-          address,
-          email,
-          userType: UserType.student,
-        );
+    required this.userType,
+  })  : userId = userId ?? '',
+        name = name ?? '',
+        surname = surname ?? '',
+        age = age ?? 0,
+        address = address ?? '',
+        email = email ?? '';
 
-  factory Student.fromJson(Map<String, dynamic> json) =>
-      _$StudentFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$StudentToJson(this);
+  Map<String, dynamic> toJson() => _$UserToJson(this);
 }
 
 @JsonSerializable(explicitToJson: true)
 class Teacher extends User {
-  EducationType? educationType;
-  Speciality? specialty;
-  String? phoneNumber;
-
   Teacher({
     String? userId,
     String? name,
@@ -68,17 +54,20 @@ class Teacher extends User {
     int? age,
     String? address,
     String? email,
-    this.educationType,
-    this.specialty,
-    this.phoneNumber,
+    EducationType? educationType,
+    Speciality? specialty,
+    String? phoneNumber,
   }) : super(
-          userId ?? '',
-          name ?? '',
-          surname ?? '',
-          age ?? 0,
-          address ?? '',
-          email ?? '',
+          userId: userId,
+          name: name,
+          surname: surname,
+          age: age,
+          address: address,
+          email: email,
           userType: UserType.teacher,
+          educationType: educationType,
+          specialty: specialty,
+          phoneNumber: phoneNumber,
         );
 
   factory Teacher.fromJson(Map<String, dynamic> json) =>

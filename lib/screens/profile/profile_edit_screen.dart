@@ -1,10 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:online_mentor/blocs/registration/registration_cubit.dart';
-import 'package:online_mentor/blocs/registration/registration_state.dart';
+import 'package:online_mentor/blocs/profiile_edit/profile_edit_cubit.dart';
+import 'package:online_mentor/blocs/profiile_edit/profile_edit_state.dart';
 import 'package:online_mentor/core/enums.dart';
 import 'package:online_mentor/core/input_validators.dart';
 import 'package:online_mentor/screens/login_screen/login_screen.dart';
@@ -12,7 +11,7 @@ import 'package:online_mentor/service_locator.dart';
 import 'package:online_mentor/utils/primary_snackbar.dart';
 import 'package:online_mentor/widgets/forms/primary_text_field.dart';
 
-class RegistrationScreen extends StatelessWidget {
+class ProfileEditScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,15 +20,13 @@ class RegistrationScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('registration'),
-              RegistrationForm(),
+              Text('Profile edit'),
+              ProfileEditForm(),
               SizedBox(height: 10.0),
               GestureDetector(
-                onTap: () => Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                ),
+                onTap: () => Navigator.of(context).pop(),
                 child: Text(
-                  'already_have_account',
+                  'Назад',
                   style: TextStyle(
                     color: Colors.blue,
                   ),
@@ -43,23 +40,37 @@ class RegistrationScreen extends StatelessWidget {
   }
 }
 
-class RegistrationForm extends StatelessWidget {
-  late final TextEditingController _emailTextController =
-      _createTextEditingController('', () {
-    getIt<RegistrationCubit>().setEmail(_emailTextController.text);
+class ProfileEditForm extends StatelessWidget {
+  final ProfileEditCubit profileEditCubit = getIt<ProfileEditCubit>();
+  late final TextEditingController _nameTextController =
+      _createTextEditingController(profileEditCubit.state.name, () {
+    getIt<ProfileEditCubit>().setName(_nameTextController.text);
   });
-  late final TextEditingController _passwordTextController =
-      _createTextEditingController('', () {
-    getIt<RegistrationCubit>().setName(_passwordTextController.text);
+  late final TextEditingController _surnameTextController =
+      _createTextEditingController(profileEditCubit.state.surname, () {
+    getIt<ProfileEditCubit>().setSurname(_surnameTextController.text);
+  });
+  late final TextEditingController _addressTextController =
+      _createTextEditingController(profileEditCubit.state.address, () {
+    getIt<ProfileEditCubit>().setAddress(_addressTextController.text);
+  });
+  late final TextEditingController _emailTextController =
+      _createTextEditingController(profileEditCubit.state.email.value, () {
+    getIt<ProfileEditCubit>().setEmail(_emailTextController.text);
   });
   late final TextEditingController _phoneNumberTextController =
-      _createTextEditingController('', () {
-    getIt<RegistrationCubit>().setPhone(_phoneNumberTextController.text);
+      _createTextEditingController(profileEditCubit.state.phoneNumber.value,
+          () {
+    getIt<ProfileEditCubit>().setPhone(_phoneNumberTextController.text);
+  });
+  late final TextEditingController _languageTextController =
+      _createTextEditingController(profileEditCubit.state.language, () {
+    getIt<ProfileEditCubit>().setPhone(_languageTextController.text);
   });
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<RegistrationCubit, RegistrationState>(
+    return BlocConsumer<ProfileEditCubit, ProfileEditState>(
       listenWhen: (p, c) => p.registrationStatus != c.registrationStatus,
       buildWhen: (p, c) =>
           p.userType != c.userType ||
@@ -71,8 +82,7 @@ class RegistrationForm extends StatelessWidget {
           // Show error snackbar
           PrimarySnackbar.showSnackbar(context: context, message: state.error);
         } else if (state.registrationStatus.isSubmissionSuccess) {
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => LoginScreen()));
+          Navigator.of(context).popUntil((route) => route.isFirst);
         }
       },
       builder: (context, state) {
@@ -87,35 +97,22 @@ class RegistrationForm extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              DropdownButtonFormField<UserType>(
-                value: state.userType,
-                onChanged: (value) =>
-                    context.read<RegistrationCubit>().setUserType(value!),
-                items: [
-                  for (var userType in UserType.values)
-                    DropdownMenuItem(
-                      value: userType,
-                      child: Text(userType.label ?? ''),
-                    ),
-                ],
-                decoration: InputDecoration(
-                  labelText: 'User Type',
-                ),
+              ListTile(
+                title: Text('Тип пользователя'),
+                subtitle: Text(state.userType.label ?? ""),
               ),
               SizedBox(height: 16.0),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: PrimaryTextField(
-                  onChanged: (value) =>
-                      context.read<RegistrationCubit>().setName(value),
+                  controller: _nameTextController,
                   labelText: 'Name',
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: PrimaryTextField(
-                  onChanged: (value) =>
-                      context.read<RegistrationCubit>().setSurname(value),
+                  controller: _surnameTextController,
                   labelText: 'Surname',
                 ),
               ),
@@ -124,7 +121,7 @@ class RegistrationForm extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 16),
                   child: PrimaryTextField(
                     onChanged: (value) => context
-                        .read<RegistrationCubit>()
+                        .read<ProfileEditCubit>()
                         .setAge(int.tryParse(value) ?? 0),
                     labelText: 'Age',
                     keyboardType: TextInputType.number,
@@ -133,8 +130,7 @@ class RegistrationForm extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: PrimaryTextField(
-                  onChanged: (value) =>
-                      context.read<RegistrationCubit>().setAddress(value),
+                  controller: _addressTextController,
                   labelText: 'Address',
                 ),
               ),
@@ -163,28 +159,11 @@ class RegistrationForm extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: BlocBuilder<RegistrationCubit, RegistrationState>(
+                child: BlocBuilder<ProfileEditCubit, ProfileEditState>(
                   builder: (context, state) {
                     return PrimaryTextField(
-                      onChanged: (value) =>
-                          context.read<RegistrationCubit>().setPassword(value),
-                      labelText: 'Password',
-                      hasError: state.password.invalid,
-                      errorText: state.password.error.value,
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: BlocBuilder<RegistrationCubit, RegistrationState>(
-                  builder: (context, state) {
-                    return PrimaryTextField(
-                      onChanged: (value) =>
-                          context.read<RegistrationCubit>().setLanguage(value),
+                      controller: _languageTextController,
                       labelText: 'Language',
-                      hasError: state.password.invalid,
-                      errorText: state.password.error.value,
                     );
                   },
                 ),
@@ -194,7 +173,7 @@ class RegistrationForm extends StatelessWidget {
                 DropdownButtonFormField<EducationType>(
                   value: state.educationType,
                   onChanged: (value) =>
-                      context.read<RegistrationCubit>().setEducation(value!),
+                      context.read<ProfileEditCubit>().setEducation(value!),
                   items: [
                     for (var educationType in EducationType.values)
                       DropdownMenuItem(
@@ -207,61 +186,19 @@ class RegistrationForm extends StatelessWidget {
                   ),
                 ),
               SizedBox(height: 16.0),
-              if (state.userType == 'teacher')
-                DropdownButtonFormField<String>(
-                  value: state.classification,
-                  onChanged: (value) => context
-                      .read<RegistrationCubit>()
-                      .setClassification(value!),
-                  items: [
-                    DropdownMenuItem(
-                      value: 'primary',
-                      child: Text('Primary Education'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'secondary',
-                      child: Text('Secondary Education'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'high_school',
-                      child: Text('High School Education'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'college',
-                      child: Text('College Education'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'university',
-                      child: Text('University Education'),
-                    ),
-                  ],
-                  decoration: InputDecoration(
-                    labelText: 'Classification',
-                  ),
-                ),
-              SizedBox(height: 16.0),
-              if (state.userType == 'teacher')
-                TextFormField(
-                  onChanged: (value) =>
-                      context.read<RegistrationCubit>().setWorkingPeriod(value),
-                  decoration: InputDecoration(
-                    labelText: 'Working Period',
-                  ),
-                ),
-              SizedBox(height: 16.0),
-              BlocBuilder<RegistrationCubit, RegistrationState>(
+              BlocBuilder<ProfileEditCubit, ProfileEditState>(
                 buildWhen: (p, c) =>
                     p.registrationStatus != c.registrationStatus,
                 builder: (context, state) {
                   return ElevatedButton(
-                    onPressed: context.read<RegistrationCubit>().registerUser,
+                    onPressed: context.read<ProfileEditCubit>().registerUser,
                     child: state.registrationStatus.isSubmissionInProgress
                         ? Center(
                             child: CircularProgressIndicator(
                               color: Colors.white,
                             ),
                           )
-                        : Text('Register'),
+                        : Text('Сохранить'),
                   );
                 },
               ),

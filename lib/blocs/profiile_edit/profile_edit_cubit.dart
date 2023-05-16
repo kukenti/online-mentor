@@ -3,19 +3,46 @@ import 'package:firebase_auth/firebase_auth.dart' as fba;
 import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 import 'package:injectable/injectable.dart';
+import 'package:online_mentor/blocs/profiile_edit/profile_edit_state.dart';
+import 'package:online_mentor/blocs/profile/profile_cubit.dart';
 import 'package:online_mentor/core/enums.dart';
 import 'package:online_mentor/core/input_validators.dart';
 import 'package:online_mentor/models/user/user.dart';
 import 'package:online_mentor/repositories/user_repository.dart';
 
-import 'registration_state.dart';
-
 @lazySingleton
-class RegistrationCubit extends Cubit<RegistrationState> {
+class ProfileEditCubit extends Cubit<ProfileEditState> {
   final fba.FirebaseAuth _firebaseAuth = fba.FirebaseAuth.instance;
   final UserRepository _userRepository;
+  final ProfileCubit profileCubit;
 
-  RegistrationCubit(this._userRepository) : super(RegistrationState());
+  ProfileEditCubit(
+    this._userRepository,
+    this.profileCubit,
+  ) : super(ProfileEditState()) {
+    handleProfileChanged(profileCubit.state.user);
+
+    profileCubit.stream.listen((event) {
+      handleProfileChanged(event.user);
+    });
+  }
+
+  void handleProfileChanged(User? user) {
+    if (user == null) {
+      return;
+    }
+    emit(state.copyWith(
+      userType: user.userType,
+      name: user.name,
+      surname: user.surname,
+      age: user.age,
+      address: user.address,
+      email: Email.dirty(user.email),
+      phoneNumber: Phone.dirty(user.phoneNumber ?? ''),
+      language: user.language,
+      educationType: user.educationType,
+    ));
+  }
 
   void setUserType(UserType userType) {
     emit(state.copyWith(userType: userType));
@@ -65,28 +92,14 @@ class RegistrationCubit extends Cubit<RegistrationState> {
 
   Future<void> registerUser() async {
     emit(state.copyWith(
-      registrationStatus: Formz.validate([
-        state.email,
-        state.password,
-      ]),
+      registrationStatus: Formz.validate([state.email, state.phoneNumber]),
     ));
 
     try {
-      // emit(state.copyWith(isLoading: true));
-      fba.UserCredential userCredential =
-          await _firebaseAuth.createUserWithEmailAndPassword(
-        email: state.email.value,
-        password: state.password.value!,
-      );
-
-      if (userCredential.user == null) {
-        return;
-      }
-
       // Additional registration logic based on user type
       if (state.userType == UserType.student) {
         await _userRepository.saveUser(User(
-          userId: userCredential.user!.uid,
+          userId: profileCubit.state.userId,
           name: state.name,
           surname: state.surname,
           age: state.age,
@@ -97,7 +110,7 @@ class RegistrationCubit extends Cubit<RegistrationState> {
         ));
       } else if (state.userType == UserType.teacher) {
         await _userRepository.saveUser(Teacher(
-          userId: userCredential.user!.uid,
+          userId: profileCubit.state.userId,
           name: state.name,
           surname: state.surname,
           age: state.age,
@@ -133,10 +146,10 @@ class RegistrationCubit extends Cubit<RegistrationState> {
         case 'weak-password':
           return 'The password is too weak.';
         default:
-          return 'Registration failed. Please try again.';
+          return 'ProfileEdit failed. Please try again.';
       }
     } else {
-      return 'Registration failed. Please try again.';
+      return 'ProfileEdit failed. Please try again.';
     }
   }
 

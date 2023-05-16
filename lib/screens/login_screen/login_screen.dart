@@ -67,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: PrimaryTextField(
                           controller: _emailTextController,
                           labelText: 'email',
-                          isInvalid: state.email.invalid,
+                          hasError: state.email.invalid,
                           errorText: state.email.error?.value,
                         ),
                       );
@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _passwordTextController,
                           labelText: 'password',
                           obscureText: true,
-                          isInvalid: state.password.invalid,
+                          hasError: state.password.invalid,
                           errorText: state.password.error.value,
                         ),
                       );
