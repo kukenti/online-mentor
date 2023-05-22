@@ -63,6 +63,7 @@ class RegistrationForm extends StatelessWidget {
       listenWhen: (p, c) => p.registrationStatus != c.registrationStatus,
       buildWhen: (p, c) =>
           p.userType != c.userType ||
+          p.email != c.email ||
           p.registrationStatus != c.registrationStatus,
       listener: (context, state) {
         if (state.registrationStatus.isSubmissionInProgress) {
@@ -119,17 +120,16 @@ class RegistrationForm extends StatelessWidget {
                   labelText: 'Surname',
                 ),
               ),
-              if (state.userType == UserType.student)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: PrimaryTextField(
-                    onChanged: (value) => context
-                        .read<RegistrationCubit>()
-                        .setAge(int.tryParse(value) ?? 0),
-                    labelText: 'Age',
-                    keyboardType: TextInputType.number,
-                  ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: PrimaryTextField(
+                  onChanged: (value) => context
+                      .read<RegistrationCubit>()
+                      .setAge(int.tryParse(value) ?? 0),
+                  labelText: 'Age',
+                  keyboardType: TextInputType.number,
                 ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: PrimaryTextField(
@@ -169,6 +169,7 @@ class RegistrationForm extends StatelessWidget {
                       onChanged: (value) =>
                           context.read<RegistrationCubit>().setPassword(value),
                       labelText: 'Password',
+                      obscureText: true,
                       hasError: state.password.invalid,
                       errorText: state.password.error.value,
                     );

@@ -37,12 +37,25 @@ class TeacherCard extends StatelessWidget {
                   height: 50,
                   child: Icon(Icons.person),
                 ),
-          title: Text(
-            '${teacher.name} ${teacher.surname}',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
+          title: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Text(
+                  '${teacher.name} ${teacher.surname}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                '${teacher.age ?? 0} Лет',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ],
           ),
           subtitle: Column(
             children: [
@@ -70,6 +83,23 @@ class TeacherCard extends StatelessWidget {
                     ),
                     Text(
                       teacher.email ?? '',
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.call,
+                      color: Colors.green,
+                    ),
+                    Text(
+                      teacher.phoneNumber ?? '',
                       style: TextStyle(
                         color: Colors.grey,
                       ),
@@ -176,10 +206,6 @@ class TeacherCard extends StatelessWidget {
               ListTile(
                 leading: Text('Образование'),
                 trailing: Text(teacher.educationType?.label ?? 'Нет данных'),
-              ),
-              ListTile(
-                leading: Text('Специализация'),
-                trailing: Text(teacher.specialty?.name ?? 'Нет данных'),
               ),
               ListTile(
                 leading: Text('Специализация'),

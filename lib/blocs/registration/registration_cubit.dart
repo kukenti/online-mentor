@@ -92,6 +92,7 @@ class RegistrationCubit extends Cubit<RegistrationState> {
           age: state.age,
           address: state.address,
           email: state.email.value,
+          educationType: state.educationType,
           language: 'ru',
           userType: UserType.student,
         ));
@@ -103,6 +104,7 @@ class RegistrationCubit extends Cubit<RegistrationState> {
           age: state.age,
           address: state.address,
           phoneNumber: state.phoneNumber.value,
+          educationType: state.educationType,
           email: state.email.value,
         ));
       }

@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => getIt<ProfileEditCubit>()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Online mentor',
         debugShowCheckedModeBanner: false,
         home: SplashScreen(),
       ),
